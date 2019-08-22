@@ -1,0 +1,57 @@
+.parent-flex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    height: 100%;
+}
+
+.child-flex {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+}
+
+.input-flex {
+  display: flex;
+  flex-direction: row;
+  margin-left: -2em;
+}
+
+.members-input-flex {
+  display: flex;
+  flex-direction: row;
+  margin-left: -3em;
+}
+
+#user-input, #space-input {
+  height: 1.5em;
+}
+
+#user-button, #space-button{
+  margin-left: 0.3em;
+}
+
+#user-box, #space-box, #member-box {
+  margin-left: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+#user-remove-button, #space-remove-button {
+  margin-right: 5em;
+}
+
+#member-input-username, #member-input-spacename {
+  margin-right: 0.5em;
+  height: 1.5em;
+}
+
+#member-button {
+  margin-left: -0.2em;
+}
+
+#member-remove-button {
+  margin-left: -2em;
+  width:fit-content;
+}

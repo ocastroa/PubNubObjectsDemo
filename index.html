@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			<meta name="description" content="Example of using PubNub Objects with PubNub JavaScript V4 SDK.">
+			<meta name="keywords" content="JavaScript,PubNub,Objects,SDK,PubSub-sdk,tutorial">
+			<meta name="author" content="Oscar Castro">
+			<title>PubNub Objects Demo</title>
+			<link rel = "stylesheet" type = "text/css" href = "styles.css" />
+		</head>
+		
+    <body>
+			<div class="parent-flex">
+				<div class="child-flex">
+						<p>Add a new user</p>
+						<div class="input-flex">
+							<input id="user-input" placeholder="Enter username"/>
+							<button id="user-button" onclick="addUser()">Enter</button>
+						</div>
+						<p>Users added:</p>
+						<div id="user-box"></div>
+						<button id="user-remove-button" onclick="removeUser()">Remove user</button>
+				</div>
+
+				<div class="child-flex">
+						<p>Add a new space</p>
+						<div class="input-flex">
+							<input id="space-input" placeholder="Enter spacename"/>
+							<button id="space-button" onclick="addSpace()">Enter</button>
+						</div>
+						<p>Spaces added:</p>
+						<div id="space-box"></div>
+						<button id="space-remove-button">Remove space</button>
+				</div>
+
+				<div class="child-flex">
+						<p>Add user to a space</p>
+						<div class="members-input-flex">
+							<input id="member-input-spacename" placeholder="Enter spacename"/>
+							<input id="member-input-username" placeholder="Enter username"/>
+							<button id="member-button" onclick="addMemberToSpace()">Enter</button>
+						</div>
+						<p>Memberships:</p>
+						<div id="member-box"></div>
+						<button id="member-remove-button">Remove user from space</button>
+				</div>
+			</div>
+	
+			<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.25.0.min.js"></script>
+			<script src="objects.js"></script>
+   </body>
+</html>
