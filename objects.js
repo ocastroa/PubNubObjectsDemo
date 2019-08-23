@@ -50,36 +50,47 @@
   }	
 
   // Add user
-  addUser = () => {
-    publish({
-      userInput: userInput.value
-    })
-    userInput.value = '';
+  addUserInfo = (e) => {
+    if((e.keyCode || e.charCode) === 13){
+      publish({
+        userInput: userInput.value
+      });
+      userInput.value = '';
+    }
   }
+
+  userInput.addEventListener('keypress', addUserInfo);
 
   // Add space
-  addSpace = () => {
-    publish({
-      spaceInput: spaceInput.value
-    })
-    spaceInput.value = '';
+  addSpaceInfo = (e) => {
+    if((e.keyCode || e.charCode) === 13){
+      publish({
+        spaceInput: spaceInput.value
+      });
+      spaceInput.value = '';
+    }
   }
 
+  spaceInput.addEventListener('keypress', addSpaceInfo);
+
   // Add user to a space
-  addMemberToSpace = () => {
-    // Input fields cannot be empty
-    if(memberInputSpacename.value && memberInputUsername.value){
-      publish({
-        memberInputSpacename: memberInputSpacename.value,
-        memberInputUsername: memberInputUsername.value
-      });
-      memberInputSpacename.value = '';
-      memberInputUsername.value = '';
-    }
-    else {
-      alert('Enter both space and user field')
+  addMemberToSpace = (e) => {
+    if((e.keyCode || e.charCode) === 13){
+      if(memberInputSpacename.value && memberInputUsername.value){
+        publish({
+          memberInputSpacename: memberInputSpacename.value,
+          memberInputUsername: memberInputUsername.value
+        });
+        memberInputSpacename.value = '';
+        memberInputUsername.value = '';
+      }
+      else {
+        alert('Enter both space and user field')
+      }
     }
   }
+
+  memberInputUsername.addEventListener('keypress', addMemberToSpace);
 
   removeUser = () =>{
     if(userBox.innerHTML.length === 0) return;

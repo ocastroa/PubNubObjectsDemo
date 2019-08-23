@@ -9,14 +9,13 @@
 .child-flex {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     height: 100%;
 }
 
 .input-flex {
   display: flex;
   flex-direction: row;
-  margin-left: -2em;
+  margin-left: -0.5em;
 }
 
 .members-input-flex {
@@ -36,6 +35,7 @@
 #user-box, #space-box, #member-box {
   margin-left: 0.5em;
   margin-bottom: 0.5em;
+  margin-top: -0.5em;
 }
 
 #user-remove-button, #space-remove-button {
