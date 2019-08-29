@@ -1,12 +1,83 @@
 (function() {
-  let userInput = document.getElementById("user-input"), spaceInput = document.getElementById("space-input"),
-    memberInputUsername = document.getElementById("member-input-username"), memberInputSpacename = document.getElementById("member-input-spacename"), 
-    userBox =  document.getElementById("user-box"), spaceBox =  document.getElementById("space-box"),
-    memberBox =  document.getElementById("member-box"), channel = 'objects';
-
+  // Store user names, space names, and memberships to arrays for later retrieval
   let users = [];
   let spaces = [];
   let members = [];
+
+  let userInput = document.getElementById("user-input"), spaceInput = document.getElementById("space-input"),
+  memberInputUsername = document.getElementById("member-input-username"), memberInputSpacename = document.getElementById("member-input-spacename"), 
+  userBox =  document.getElementById("user-box"), spaceBox =  document.getElementById("space-box"),
+  memberBox =  document.getElementById("member-box"), membershipBox = document.getElementById("membership-box"), spaceIdInput =  document.getElementById('space-id-input'), channel = 'objects';
+
+  // Fetch data from objects to display on screen
+  document.addEventListener("DOMContentLoaded", function() {
+    // Get user objects. Set max number of results returned to 5
+    pubnub.getUsers(
+      {
+          limit: 5
+      },
+      function(status, response) {
+        let spaceData = response.data;
+
+        for(let x = 0; x < spaceData.length; x++){
+          let userId = spaceData[x]['id']; // Get userId
+          let userName = spaceData[x]['name']; // Get username
+
+          // Add to the beginning of users array
+          users.unshift({
+            user_id: userId,
+            user_input: userName
+          });
+
+          // Display users on screen
+          userBox.innerHTML =  (''+userId)+ ': ' + (''+userName) +  '<br>' + userBox.innerHTML;
+
+          // Get the user space memberships
+          pubnub.getMemberships(
+            {
+                userId: userId
+            },
+            function(status, response) {
+              // Check if the user is a member of a space
+              if(response.data.length > 0){
+                let membershipData = response.data;
+                for(let x = 0; x < membershipData.length; x++){
+                  let spaceNameId = membershipData[x]['id']; // Get userId
+        
+                  members.unshift({ // Add to members array
+                    'space_id' : spaceNameId,
+                    'user_id' : userId,
+                  });
+                  // Display on screen
+                  memberBox.innerHTML =  (''+spaceNameId)+ ': ' + (''+userId) +'<br>' + memberBox.innerHTML;
+                }
+              }
+          });
+        }
+      }
+    );
+
+    // Get space objects.Set max number of results returned to 5
+    pubnub.getSpaces(
+      {
+          limit: 5
+      },
+      function(status, response) {
+        let spaceData = response.data;
+        for(let x = 0; x < spaceData.length; x++){
+          let spaceId = spaceData[x]['id'];// get space id
+          let spaceName = spaceData[x]['name']; // get space name
+
+          spaces.unshift({ //add to spaces array
+            space_id : spaceId,
+            space_input : spaceName
+          });
+
+          // Display on screen
+          spaceBox.innerHTML =  (''+spaceId)+ ': ' + (''+spaceName) + '<br>' + spaceBox.innerHTML;
+      }
+    });
+  });
 
   // Init PubNub
   let pubnub = new PubNub({
@@ -15,47 +86,36 @@
     ssl: true
   });
 
-  // Listen to messages that arrive in the channel
-  pubnub.addListener({
-    message: function(msg) {
-      if(msg.message.userInput){
-        users.unshift(msg.message.userInput);
-        userBox.innerHTML =  (''+msg.message.userInput)+ '<br>' + userBox.innerHTML;
-      }
-
-      else if(msg.message.spaceInput){
-        spaces.unshift(msg.message.spaceInput);
-        spaceBox.innerHTML =  (''+msg.message.spaceInput)+ '<br>' + spaceBox.innerHTML;
-      }
-
-      else if(msg.message.memberInputSpacename){
-        members.unshift({
-          'space_name' : msg.message.memberInputSpacename,
-          'user_name' : msg.message.memberInputUsername,
-        });
-        memberBox.innerHTML =  (''+msg.message.memberInputSpacename)+ ': ' + (''+msg.message.memberInputUsername) +'<br>' + memberBox.innerHTML;
-      }
-    }
-  });
-
   // Subscribe to a channel
-  pubnub.subscribe({channels: [channel]}); 
-
-  // Helper function to publish messages to channel
-  publish = (data) => {
-    pubnub.publish({
-      channel: channel,
-      message: data
-    })
-  }	
+  pubnub.subscribe({
+    channels: [channel]
+  }); 
 
   // Add user
   addUserInfo = (e) => {
+    // When user presses the 'Enter' key
     if((e.keyCode || e.charCode) === 13){
-      publish({
-        userInput: userInput.value
+      /* 
+       Generate random number for the user Id.
+       Note: Id must be unique and might typically be the users UUID 
+      */
+      let randNum = Math.floor(Math.random() * 50);
+      let userId = `${userInput.value}-${randNum}`;
+    
+      pubnub.createUser(
+        {
+          id: userId,
+          name: userInput.value
+        },
+        function(status, response) {
+          users.unshift({
+            user_id : userId,
+            user_input : userInput.value
+          });
+          // Display on screen
+          userBox.innerHTML =  (''+ userId)+ ': ' + (''+ userInput.value) +  '<br>' + userBox.innerHTML;
+          userInput.value = '';
       });
-      userInput.value = '';
     }
   }
 
@@ -64,63 +124,170 @@
   // Add space
   addSpaceInfo = (e) => {
     if((e.keyCode || e.charCode) === 13){
-      publish({
-        spaceInput: spaceInput.value
-      });
-      spaceInput.value = '';
+      // Generate random number for the space Id.
+      let randNum = Math.floor(Math.random() * 50);
+      let spaceId = `${spaceInput.value}-${randNum}`;
+
+      pubnub.createSpace(
+        {
+          id: spaceId,
+          name: spaceInput.value
+        },
+        function(status, response) {
+          spaces.unshift({
+            space_id : spaceId,
+            space_input : spaceInput.value
+          });
+          spaceBox.innerHTML =  (''+ spaceId)+ ': ' + (''+ spaceInput.value) + '<br>' + spaceBox.innerHTML;
+          spaceInput.value = '';
+        });
     }
   }
 
   spaceInput.addEventListener('keypress', addSpaceInfo);
 
   // Add user to a space
-  addMemberToSpace = (e) => {
+  addUserToSpace = (e) => {
     if((e.keyCode || e.charCode) === 13){
+      // Check that both input fields are not empty
       if(memberInputSpacename.value && memberInputUsername.value){
-        publish({
-          memberInputSpacename: memberInputSpacename.value,
-          memberInputUsername: memberInputUsername.value
+        pubnub.joinSpaces(
+          {
+          userId: memberInputUsername.value, // Get user
+          spaces: [
+            {
+              id: memberInputSpacename.value // Join to this space
+            }
+          ]
+        },
+        function(status, response) {
+          if(status.error){
+            alert('Error: Check that space-id and user-id is correct')
+            return;
+          }
+          members.unshift({
+            'space_id' : memberInputSpacename.value, 
+            'user_id' : memberInputUsername.value,
+          });
+          memberBox.innerHTML =  (''+ memberInputSpacename.value) + ': ' + (''+ memberInputUsername.value) +'<br>' + memberBox.innerHTML;
+          memberInputSpacename.value = '';
+          memberInputUsername.value = '';  
         });
-        memberInputSpacename.value = '';
-        memberInputUsername.value = '';
-      }
+      } 
       else {
         alert('Enter both space and user field')
       }
     }
   }
 
-  memberInputUsername.addEventListener('keypress', addMemberToSpace);
+  memberInputUsername.addEventListener('keypress', addUserToSpace);
 
+  // Get members from space
+  getMembersFromSpace = (e) => {
+    if((e.keyCode || e.charCode) === 13){
+      // Remove previous results from the screen
+      membershipBox.innerHTML = '';
+
+      pubnub.getMembers(
+        {
+            spaceId: spaceIdInput.value,
+            limit: 10
+        },
+        function(status, response) {
+         if(status.error){
+            alert('Error: Check that space-id is correct')
+            return;
+         }
+
+         let members = response.data;
+         // Iterate the array and get the user id for each object
+         for(let x = 0; x < members.length; x++){
+            let userId = members[x]['id'];
+            // Get the username with the user id
+            pubnub.getUser(
+              {
+                  userId: userId
+              },
+              function(status, response) {
+               // Display username on screen
+               membershipBox.innerHTML =  (''+ response.data['name'])+ '<br>' + membershipBox.innerHTML;
+               spaceIdInput.value = '';       
+              }
+          );
+         }
+      });
+    }
+  }
+
+  spaceIdInput.addEventListener('keypress', getMembersFromSpace);
+ 
+  // Remove user
   removeUser = () =>{
-    if(userBox.innerHTML.length === 0) return;
+    //get user id from the first element of the array
+    let userId = users.slice(0,1)[0]["user_id"];
+    //remove user from user objects
+    pubnub.deleteUser(userId, function(status, response) { 
+      console.log(response);
+    });
+
+    // Remove the first element from the users array
     users = users.slice(1);
     userBox.innerHTML = '';
-    for(let x = users.length - 1; x >= 0; x--){ // start from end of array
-			userBox.innerHTML = (''+ users[x]) + '<br>' + userBox.innerHTML;
+
+    for(let x = users.length - 1; x >= 0; x--){ // start from end of array     
+      let userId = users[x]['user_id']; // get user id
+      let userValue = users[x]['user_input']; // get user value
+      userBox.innerHTML =  (''+userId)+ ': ' + (''+userValue) +  '<br>' + userBox.innerHTML;
 		}
   }
 
+  // Remove space
   removeSpace = () => {
-    if(spaceBox.innerHTML.length === 0) return;
+     //get space id from the first element of the array
+    let spaceId = spaces.slice(0,1)[0]['space_id'];
+    //remove space from space objects
+    pubnub.deleteSpace(spaceId, function(status, response) {
+      console.log(response);
+    });
+
+    // Remove the first element from the spaces array
     spaces = spaces.slice(1);
     spaceBox.innerHTML = '';
+
     for(let x = spaces.length - 1; x >= 0; x--){ // start from end of array
-			spaceBox.innerHTML = (''+ spaces[x]) + '<br>' + spaceBox.innerHTML;
+      let spaceId = spaces[x]['space_id'];// get space id
+      let spaceValue = spaces[x]['space_input']; // get space value
+      spaceBox.innerHTML =  (''+spaceId)+ ': ' + (''+spaceValue) +  '<br>' + spaceBox.innerHTML;
 		}
   }
 
-  removeMember = () => {
-    members = members.slice(1);
-    memberBox.innerHTML = '';
-
-    for(let x = members.length - 1; x >= 0; x--){ // start from end of array
-      let obj = members[x];
-      let keyOne = obj[Object.keys(obj)[0]]; // get first value of object
-      let keyTwo = obj[Object.keys(obj)[1]]; // get second value of object
-			memberBox.innerHTML = (''+ keyOne) + ': ' + (''+ keyTwo) + '<br>' + memberBox.innerHTML;
-		}
+  // Remove user from a space
+  removeFromSpace = () => {
+    //get user id from the first element of the array
+    let userId = members.slice(0,1)[0]['user_id'];
+    //get space id from the first element of the array
+    let spaceId = members.slice(0,1)[0]['space_id'];
+    
+    // Remove user from space objects
+    pubnub.leaveSpaces(
+      {
+        userId: userId,
+        spaces: [
+          spaceId
+        ]
+      },
+      function(status, response) {
+        // Remove the first element from the members array
+        members = members.slice(1);
+        memberBox.innerHTML = '';
+    
+        for(let x = members.length - 1; x >= 0; x--){ // start from end of array
+          let spaceId = members[x]['space_id']; // get space id
+          let userId = members[x]['user_id']; // get user id
+          memberBox.innerHTML = (''+ spaceId) + ': ' + (''+ userId) + '<br>' + memberBox.innerHTML;
+        }
+      }
+    );
   }
-
 })();
   

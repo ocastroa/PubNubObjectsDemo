@@ -35,12 +35,21 @@
       <div class="child-flex">
           <p>Add user to a space</p>
           <div class="members-input-flex">
-            <input id="member-input-spacename" placeholder="Enter spacename"/>
-            <input id="member-input-username" placeholder="Enter username"/>
+            <input id="member-input-spacename" placeholder="Enter space id"/>
+            <input id="member-input-username" placeholder="Enter user id"/>
           </div>
-          <p>Memberships:</p>
+          <p>Spaces Joined:</p>
           <div id="member-box"></div>
-          <button id="member-remove-button" onclick="removeMember()">Remove user from space</button>
+          <button id="member-remove-button" onclick="removeFromSpace()">Remove user from space</button>
+      </div>
+
+      <div class="child-flex">
+        <p>Get Members</p>
+        <div class="input-flex">
+          <input id="space-id-input" placeholder="Enter space id"/>
+        </div>
+        <p>Members:</p>
+        <div id="membership-box"></div>
       </div>
     </div>
 

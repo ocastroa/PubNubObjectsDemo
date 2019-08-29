@@ -33,13 +33,19 @@
 }
 
 #user-box, #space-box, #member-box {
-  margin-left: 0.5em;
   margin-bottom: 0.5em;
   margin-top: -0.5em;
 }
 
+#membership-box {
+  margin-bottom: 0.5em;
+  margin-top: -0.5em;
+  margin-left: 0.8em;
+}
+
 #user-remove-button, #space-remove-button {
-  margin-right: 5em;
+  margin-left: 0.5em;
+  margin-right: 3em;
 }
 
 #member-input-username, #member-input-spacename {
@@ -52,6 +58,7 @@
 }
 
 #member-remove-button {
-  margin-left: -2em;
+  margin-left: -1em;
+  margin-right: 3em;
   width:fit-content;
 }
