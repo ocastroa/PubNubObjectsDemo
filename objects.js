@@ -193,7 +193,7 @@
       pubnub.getMembers(
         {
             spaceId: spaceIdInput.value,
-            limit: 10
+            limit: 5
         },
         function(status, response) {
          let members = response.data;
