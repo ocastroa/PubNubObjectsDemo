@@ -124,9 +124,7 @@
   // Add space
   addSpaceInfo = (e) => {
     if((e.keyCode || e.charCode) === 13){
-      // Generate random number for the space Id.
-      let randNum = Math.floor(Math.random() * 50);
-      let spaceId = `${spaceInput.value}-${randNum}`;
+      let spaceId = `${spaceInput.value}_id`;
 
       pubnub.createSpace(
         {
@@ -134,6 +132,10 @@
           name: spaceInput.value
         },
         function(status, response) {
+          if(status.error){
+            alert('Error: A space with that name already exists')
+            return;
+          }
           spaces.unshift({
             space_id : spaceId,
             space_input : spaceInput.value
@@ -194,12 +196,12 @@
             limit: 10
         },
         function(status, response) {
-         if(status.error){
-            alert('Error: Check that space-id is correct')
-            return;
-         }
-
          let members = response.data;
+         if(response.data.length === 0){
+          alert('Error: Member(s) not found')
+          return;
+        }
+        
          // Iterate the array and get the user id for each object
          for(let x = 0; x < members.length; x++){
             let userId = members[x]['id'];
@@ -224,7 +226,8 @@
   // Remove user
   removeUser = () =>{
     //get user id from the first element of the array
-    let userId = users.slice(0,1)[0]["user_id"];
+    let userId = users[0]["user_id"];
+
     //remove user from user objects
     pubnub.deleteUser(userId, function(status, response) { 
       console.log(response);
@@ -244,7 +247,7 @@
   // Remove space
   removeSpace = () => {
      //get space id from the first element of the array
-    let spaceId = spaces.slice(0,1)[0]['space_id'];
+    let spaceId = spaces[0]['space_id'];
     //remove space from space objects
     pubnub.deleteSpace(spaceId, function(status, response) {
       console.log(response);
@@ -264,9 +267,9 @@
   // Remove user from a space
   removeFromSpace = () => {
     //get user id from the first element of the array
-    let userId = members.slice(0,1)[0]['user_id'];
+    let userId = members[0]['user_id'];
     //get space id from the first element of the array
-    let spaceId = members.slice(0,1)[0]['space_id'];
+    let spaceId = members[0]['space_id'];
     
     // Remove user from space objects
     pubnub.leaveSpaces(
